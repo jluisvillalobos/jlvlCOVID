@@ -456,8 +456,16 @@ order by date
 --***********************************************************************
 declare @fechamax datetime2(7)
 declare @fechamaxSpain datetime2(7)
+declare @filasFechamax int
 
 select @fechamax= max(date) from world_data
+--**********************************************************************
+-- eliminar 'efecto Portugal': llegan datos muy recientes de un pais y su fecha es superior al resto de fechas
+-- por lo tanto los datos de fechas anteriores no apareceran. Si la fecha máxima tiene pocas filas se toman datos del dian antes
+--**********************************************************************
+select @filasFechamax= count(*) from world_data where date=@fechamax
+if @filasFechamax < 100 select @fechamax=dateadd(dd,-1,@fechamax)
+--**********************************************************************
 --a veces los datos de Spain solo están disponibles para el dia anterior
 select @fechamaxSpain= max(date) from world_data where country='Spain'
 
@@ -466,7 +474,7 @@ SELECT [country]
       ,sum([cases]) as cases
       ,sum([deaths]) as deaths
       ,sum([uci]) as uci
-	  ,cast(sum([deaths])*100/sum([cases]) as decimal(6,2)) as CaseFatality
+	  ,cast(sum([deaths])*100.00/sum([cases]) as decimal(6,2)) as CaseFatality
 	  ,min(CasesxMillon) as CasesXMillon
 	  ,min(DeathsxMillon) as DeathsXMillon
 INTO t02_globalXPais 
