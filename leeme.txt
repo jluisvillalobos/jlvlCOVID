@@ -1,0 +1,33 @@
+Adaptación de datos de @joebrew sobre COVID-19
+
+El script Bulk_Insert_Brew.sql toma los datos en forma de ficheros .csv que hay en el repositorio de @joebrew y los integra 
+en varias tablas de una base de datos.
+Una vez integrados y acondicionados, se generan una serie de tablas que son las que se utilizan desde Excel u otras herramientas
+para hacer gráficas etc.
+
+La base de datos en el Script se llama Coronadata.
+No es necesaria la pre-existencia de ninguna tabla en la base de datos. El script crea todas las tablas necesarias cada vez que se ejecuta.
+
+El path al repositorio con los ficheros .csv dependerá de la carpeta donde se haya clonado en repositorio de Github.
+
+TABLAS TRAS LA EJECUCION DEL SCRIPT:
+world_data 	Datos DIARIOS por país
+world_region_data 	Datos DIARIOS por pais y en los casos de USA, CHINA, ITALIA y ESPAÑA, por region 
+tablas con prefijo tnn_
+	son las tablas de output del script
+el resto de tablas que quedan en la base de datos son de trabajo 
+
+Notas sobre algunas columnas de las tablas:
+-las columnas UCI no siempre están con datos
+-las columnas con el sufijo xxxx_non_cum contienen los datos del dia
+
+El script calcula el dia Zero para CASOS y para MUERTES. La definición de dia cero en el script
+se encuentra al principio y obviamente puede cambiarse a voluntad:
+			CREATE TABLE [dbo].[NumerosParaDiaZero](
+				[id] [int] not null,
+				[CasesForDiaZero] [int] NULL,
+				[DeathsForDiaZero] [int] NULL
+			) ON [PRIMARY]
+			GO
+			INSERT INTO [dbo].[NumerosParaDiaZero] ([id],[CasesForDiaZero],[DeathsForDiaZero])
+				 VALUES (1,150,20) --Se considera DiaZero cuando se pasa de 150 casoss o 20 muertes
